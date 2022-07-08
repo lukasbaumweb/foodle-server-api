@@ -5,10 +5,14 @@ const { BadRequestError, NotAuthorizedError } = require("../utils/errors");
 const getAll = (req, res, next) => {
   const page = parseInt(req.query.page, 10) || 0;
   const limit = parseInt(req.query.limit, 10) || 10;
+  const categories = req.query.categories?.split(",") || [];
 
-  const mongooseFilter = { isPrivate: false };
+  const categoryFilter = {};
+  if (categories.length > 0) categoryFilter["category"] = { $in: categories };
+  const mongooseFilter = { isPrivate: false, ...categoryFilter };
 
   Foodle.find(mongooseFilter)
+
     .populate("author")
     .populate({
       path: "ratings",
