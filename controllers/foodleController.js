@@ -10,8 +10,9 @@ const getAll = (req, res, next) => {
 
   const filters = {};
   if (categories.length > 0) filters["category"] = { $in: categories };
-  if (text) filters["title"] = text;
-  console.log(text)
+  if (text) {
+    filters["$text"] = { $search: text };
+  }
 
   const mongooseFilter = { isPrivate: false, ...filters };
 
