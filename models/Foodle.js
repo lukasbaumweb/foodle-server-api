@@ -38,6 +38,7 @@ const FoodleSchema = new Schema(
       {
         ref: "File",
         type: mongoose.Schema.Types.ObjectId,
+        autopopulate: true,
       },
     ],
     tags: [String],
@@ -61,8 +62,10 @@ const FoodleSchema = new Schema(
 );
 
 FoodleSchema.index({ title: "text", description: "text", tags: "text" });
+FoodleSchema.plugin(require("mongoose-autopopulate"));
 
 const Foodle = mongoose.model("Foodle", FoodleSchema);
+
 
 Foodle.createIndexes();
 

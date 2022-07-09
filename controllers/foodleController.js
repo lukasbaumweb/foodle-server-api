@@ -119,7 +119,9 @@ const getPublicFoodle = (req, res, next) => {
     return;
   }
 
-  Foodle.findOne({ _id: id })
+  Foodle.findOne({
+    _id: id,
+  })
     .populate("author")
     .exec(async (err, data) => {
       if (err) {
