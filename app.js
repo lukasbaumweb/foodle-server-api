@@ -21,6 +21,7 @@ const authRouter = require("./routes/auth");
 const filesRouter = require("./routes/files");
 const ingredientRouter = require("./routes/ingredients");
 const configRouter = require("./routes/configs");
+const changeRouter = require("./routes/changes");
 const { MONGO_URI } = require("./config");
 const errorController = require("./controllers/errorController");
 
@@ -58,6 +59,8 @@ app.use("/api/v1/foodle", foodlesRouter);
 app.use("/api/v1/files", filesRouter);
 app.use("/api/v1/ingredient", ingredientRouter);
 app.use("/api/v1/config", configRouter);
+app.use("/api/v1/changes", changeRouter);
+
 app.use(errorController);
 
 mongoose
