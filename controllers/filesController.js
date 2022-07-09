@@ -14,8 +14,6 @@ const uploadImages = async (req, res, next) => {
     ? req.files.files
     : [req.files.files];
 
-  console.log(req.files.files);
-
   const payload = {};
 
   try {
@@ -73,4 +71,35 @@ const uploadImages = async (req, res, next) => {
   }
 };
 
-module.exports = { uploadImages };
+const deleteImageById = async (req, res, next) => {
+  const { id, imageId } = req.params;
+  if (!id) {
+    next(new BadRequestError("id missing"));
+    return;
+  }
+
+  if (!imageId) {
+    next(new BadRequestError("imageId missing"));
+    return;
+  }
+
+  console.log(id);
+
+  Foodle.updateOne(
+    { _id: id },
+    {
+      $pullAll: {
+        images: [{ _id: imageId }],
+      },
+    },
+    (err, data) => {
+      if (err) {
+        next(err);
+      } else {
+        res.json({ data: data });
+      }
+    }
+  );
+};
+
+module.exports = { uploadImages, deleteImageById };

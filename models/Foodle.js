@@ -32,6 +32,7 @@ const FoodleSchema = new Schema(
     },
     cookingTime: { type: Number },
     workTime: { type: Number },
+    totalTime: { type: Number },
     calories: { type: Number },
     createdAt: { type: Date, default: Date.now },
     images: [

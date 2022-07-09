@@ -192,12 +192,7 @@ const getImagesById = (req, res, next) => {
         const publicFolder =
           req.protocol + "://" + req.get("host") + "/foodles/";
 
-        const images = data?.images
-          .map((image) => ({
-            ...image._doc,
-            publicUrl: publicFolder + image._doc.storedName,
-          }))
-          .sort((a, b) => a.order - b.order);
+        const images = data?.images.sort((a, b) => a.order - b.order);
 
         res.json({ data: { images } });
       }

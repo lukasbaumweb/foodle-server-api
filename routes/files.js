@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
-const { uploadImages } = require("../controllers/filesController");
+const {
+  uploadImages,
+  deleteImageById,
+} = require("../controllers/filesController");
 
-/**
- * update one entry
- */
 router.post("/foodle/:id", authMiddleware, uploadImages);
+router.delete("/:id/:imageId", authMiddleware, deleteImageById);
 
 module.exports = router;
