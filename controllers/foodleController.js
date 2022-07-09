@@ -220,13 +220,35 @@ const createFoodle = (req, res) => {
 
 const updateFoodle = async (req, res, next) => {
   const { id } = req.params;
-  const { title, description, category, tags, ingredients, isPrivate, steps } =
-    req.body;
+  const {
+    title,
+    description,
+    category,
+    tags,
+    isPrivate,
+    steps,
+    cookingTime,
+    workTime,
+    totalTime,
+    calories,
+    ingredients,
+  } = req.body;
   if (!id) {
     next(new BadRequestError("id missing"));
     return;
   }
-  const payload = { title, description, category, tags, isPrivate, steps };
+  const payload = {
+    title,
+    description,
+    category,
+    tags,
+    isPrivate,
+    steps,
+    cookingTime,
+    workTime,
+    totalTime,
+    calories,
+  };
   if (ingredients) {
     const data = await Ingredient.create(ingredients);
 
