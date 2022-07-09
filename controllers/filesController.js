@@ -83,7 +83,6 @@ const deleteImageById = async (req, res, next) => {
     return;
   }
 
-  console.log(id);
 
   Foodle.updateOne(
     { _id: id },
