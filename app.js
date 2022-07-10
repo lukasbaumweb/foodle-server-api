@@ -11,6 +11,7 @@ const xss = require("xss-clean");
 const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const cloudinary = require("cloudinary");
 
 // Router
 const indexRouter = require("./routes/index");
@@ -60,6 +61,14 @@ app.use("/api/v1/config", configRouter);
 app.use("/api/v1/changes", changeRouter);
 
 app.use(errorController);
+
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_CLOUD_APP_SECRET,
+  });
+}
 
 mongoose
   .connect(MONGO_URI, {

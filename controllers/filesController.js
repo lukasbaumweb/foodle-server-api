@@ -2,6 +2,8 @@ const Foodle = require("../models/Foodle");
 const File = require("../models/File");
 const { getSizeFile } = require("../utils/fileUpload");
 const path = require("path");
+const cloudinary = require("cloudinary");
+const { bytesToBase64 } = require("byte-base64");
 
 const uploadImages = async (req, res, next) => {
   const { id } = req.params;
@@ -34,22 +36,32 @@ const uploadImages = async (req, res, next) => {
             uniqueFileName
           );
 
-          const file = new File({
-            title: element.title,
-            name: element.name,
-            type: element.mimetype,
-            path: element.path,
-            storedName: uniqueFileName,
-            size: getSizeFile(element.size, 2),
-            storedAt: filePath,
-            order: i,
-          });
+          const base64 = bytesToBase64(element.data);
+          const baseString = `data:image/png;base64,${base64}`;
 
-          element.mv(filePath);
+          try {
+            const result = await cloudinary.v2.uploader.upload(baseString, {
+              public_id: uniqueFileName,
+              folder: "foodles",
+            });
 
-          const savedFile = await file.save();
+            const file = new File({
+              name: element.name,
+              type: element.mimetype,
+              path: element.path,
+              storedName: uniqueFileName,
+              size: getSizeFile(element.size, 2),
+              storedAt: filePath,
+              publicUrl: result.url,
+              cloudinaryId: result.public_id,
+              order: i,
+            });
+            const savedFile = await file.save();
 
-          files.push(savedFile);
+            files.push(savedFile);
+          } catch (err) {
+            console.error(err);
+          }
         } catch (err) {
           console.error(err);
           next(err);
@@ -83,6 +95,14 @@ const deleteImageById = async (req, res, next) => {
     return;
   }
 
+  const result = await File.findById(imageId).exec();
+
+  try {
+    await cloudinary.uploader.destroy(result.cloudinaryId);
+    await File.deleteOne({ _id: imageId }).exec();
+  } catch (err) {
+    console.error(err);
+  }
 
   Foodle.updateOne(
     { _id: id },
