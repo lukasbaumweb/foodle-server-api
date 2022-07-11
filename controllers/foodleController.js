@@ -78,6 +78,7 @@ const getFoodleById = (req, res, next) => {
       if (err) {
         next(err);
       } else {
+        console.log(data.author, req.user.id);
         if (!data) {
           next(new BadRequestError("Foodle does not exists"));
         } else if (
