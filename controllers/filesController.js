@@ -40,10 +40,13 @@ const uploadImages = async (req, res, next) => {
           const baseString = `data:image/png;base64,${base64}`;
 
           try {
-            const result = await cloudinary.v2.uploader.upload(baseString, {
-              public_id: uniqueFileName,
-              folder: "foodles",
-            });
+            let result = {};
+            if (process.env.CLOUDINARY_CLOUD_NAME) {
+              result = await cloudinary.v2.uploader.upload(baseString, {
+                public_id: uniqueFileName,
+                folder: "foodles",
+              });
+            }
 
             const file = new File({
               name: element.name,
@@ -98,7 +101,9 @@ const deleteImageById = async (req, res, next) => {
   const result = await File.findById(imageId).exec();
 
   try {
-    await cloudinary.uploader.destroy(result.cloudinaryId);
+    if (process.env.CLOUDINARY_CLOUD_NAME) {
+      await cloudinary.uploader.destroy(result.cloudinaryId);
+    }
     await File.deleteOne({ _id: imageId }).exec();
   } catch (err) {
     console.error(err);
