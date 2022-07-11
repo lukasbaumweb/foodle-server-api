@@ -81,7 +81,7 @@ const getFoodleById = (req, res, next) => {
         if (!data) {
           next(new BadRequestError("Foodle does not exists"));
         } else if (
-          !data.author ||
+          data.author ||
           data.author._id.toHexString() === req.user.id
         ) {
           const foodle = {
