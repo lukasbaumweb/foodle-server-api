@@ -5,6 +5,8 @@ const path = require("path");
 const cloudinary = require("cloudinary");
 const { bytesToBase64 } = require("byte-base64");
 
+const addHTTPS = (url) => url.replace("http:", "https:");
+
 const uploadImages = async (req, res, next) => {
   const { id } = req.params;
   if (!id) {
@@ -55,7 +57,7 @@ const uploadImages = async (req, res, next) => {
               storedName: uniqueFileName,
               size: getSizeFile(element.size, 2),
               storedAt: filePath,
-              publicUrl: result.url,
+              publicUrl: addHTTPS(result.url),
               cloudinaryId: result.public_id,
               order: i,
             });

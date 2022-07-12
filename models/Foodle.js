@@ -42,6 +42,7 @@ const FoodleSchema = new Schema(
         autopopulate: true,
       },
     ],
+    startPortion: { type: Number, default: 1 },
     tags: [String],
     category: {
       type: String,
@@ -66,7 +67,6 @@ FoodleSchema.index({ title: "text", description: "text", tags: "text" });
 FoodleSchema.plugin(require("mongoose-autopopulate"));
 
 const Foodle = mongoose.model("Foodle", FoodleSchema);
-
 
 Foodle.createIndexes();
 

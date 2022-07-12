@@ -43,6 +43,33 @@ const getAll = (req, res, next) => {
     });
 };
 
+const getAllByFilter = (req, res, next) => {
+  const limit = parseInt(req.query.limit, 10) || 10;
+
+  const filters = {};
+
+  Object.entries(req.query)
+    .filter((q) => q[0] !== limit)
+    .forEach(([key, value]) => {
+      filters[key] = value;
+    });
+
+  Foodle.find(filters)
+    .populate("author")
+    .limit(limit)
+    .exec((err, foodles) => {
+      if (err) {
+        next(err);
+      } else {
+        res.json({
+          data: {
+            foodles,
+          },
+        });
+      }
+    });
+};
+
 const getMyFoodles = (req, res, next) => {
   const authorId = req.query.author;
 
@@ -78,7 +105,6 @@ const getFoodleById = (req, res, next) => {
       if (err) {
         next(err);
       } else {
-        console.log(data.author, req.user.id);
         if (!data) {
           next(new BadRequestError("Foodle does not exists"));
         } else if (
@@ -107,49 +133,6 @@ const getFoodleById = (req, res, next) => {
           next(new NotAuthorizedError("Foodle is not public"));
         } else {
           next(new BadRequestError("Foodle does not exists"));
-        }
-      }
-    });
-};
-
-const getPublicFoodle = (req, res, next) => {
-  const { id } = req.params;
-
-  if (!id) {
-    next(new BadRequestError("id missing"));
-    return;
-  }
-
-  Foodle.findOne({
-    _id: id,
-  })
-    .populate("author")
-    .exec(async (err, data) => {
-      if (err) {
-        next(err);
-      } else {
-        if (!data) {
-          next(new BadRequestError("Foodle does not exists"));
-        } else if (data.isPrivate) {
-          next(new NotAuthorizedError("Foodle is not public"));
-        } else {
-          const foodle = {
-            ...data.toObject({ flattenMaps: true }),
-          };
-
-          for (let i = 0; i < foodle.ingredients.length; i++) {
-            const ingredientId = foodle.ingredients[i];
-            const result = await Ingredient.findById(
-              ingredientId._id.toHexString()
-            )
-              .populate({ path: "config" })
-              .exec();
-            foodle.ingredients[i] = result;
-          }
-
-          res.json({
-            data: foodle,
-          });
         }
       }
     });
@@ -201,17 +184,22 @@ const getImagesById = (req, res, next) => {
 };
 
 const createFoodle = (req, res) => {
-  const { title } = req.body;
+  const { title, category } = req.body;
   if (!title) {
     next(new BadRequestError("title missing"));
     return;
-  } else {
-    Foodle.create({ ...req.body, author: req.user.id }, (err, data) => {
-      if (err) {
-        next(err);
-      } else res.json({ data });
-    });
   }
+
+  if (!category) {
+    next(new BadRequestError("category missing"));
+    return;
+  }
+
+  Foodle.create({ ...req.body, author: req.user.id }, (err, data) => {
+    if (err) {
+      next(err);
+    } else res.json({ data });
+  });
 };
 
 const updateFoodle = async (req, res, next) => {
@@ -228,6 +216,7 @@ const updateFoodle = async (req, res, next) => {
     totalTime,
     calories,
     ingredients,
+    startPortion,
   } = req.body;
   if (!id) {
     next(new BadRequestError("id missing"));
@@ -244,6 +233,7 @@ const updateFoodle = async (req, res, next) => {
     workTime,
     totalTime,
     calories,
+    startPortion,
   };
   if (ingredients) {
     const data = await Ingredient.create(ingredients);
@@ -313,5 +303,5 @@ module.exports = {
   updateFoodle,
   deleteFoodle,
   removeIngredient,
-  getPublicFoodle,
+  getAllByFilter,
 };
