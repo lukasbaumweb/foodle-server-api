@@ -99,24 +99,19 @@ const resetPassword = (req, res, next) => {
 };
 
 const changePassword = (req, res, next) => {
-  const { email, oldPassword, newPassword } = req.body;
+  const { oldPassword, newPassword } = req.body;
 
-  if (!email || !password) {
+  if (!oldPassword) {
     next(new BadRequestError("email or password missing"));
     return;
   }
 
-  if (!oldPassword) {
+  if (!newPassword) {
     next(new BadRequestError("current password missing"));
     return;
   }
 
-  if (!oldPassword) {
-    next(new BadRequestError("new password missing"));
-    return;
-  }
-
-  User.findOne({ email }, "password", (err, user) => {
+  User.findOne({ _id: req.user.id }, "password", (err, user) => {
     if (err) {
       next(err);
     }
@@ -145,6 +140,10 @@ const changePassword = (req, res, next) => {
   });
 };
 
+const checkAuthStatus = (req, res, next) => {
+  res.json({ data: { status: "authenticated" } });
+};
+
 const getCurrentUser = (req, res, next) => {
   User.findOne({ _id: req.user.id }, "+email", (err, user) => {
     if (err) {
@@ -154,10 +153,29 @@ const getCurrentUser = (req, res, next) => {
     res.json({ data: user });
   });
 };
+
+const updateUser = (req, res, next) => {
+  const { firstName, lastName, email } = req.body;
+
+  User.updateOne(
+    { _id: req.user.id },
+    { firstName, lastName, email },
+    (err, user) => {
+      if (err) {
+        next(err);
+      } else {
+        res.json({ data: user });
+      }
+    }
+  );
+};
+
 module.exports = {
   login,
   register,
   resetPassword,
   changePassword,
+  checkAuthStatus,
   getCurrentUser,
+  updateUser,
 };
