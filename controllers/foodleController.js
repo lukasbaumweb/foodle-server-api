@@ -46,7 +46,7 @@ const getAll = (req, res, next) => {
 const getAllByFilter = (req, res, next) => {
   const limit = parseInt(req.query.limit, 10) || 10;
 
-  const filters = {};
+  const filters = { isPrivate: false };
 
   Object.entries(req.query)
     .filter((q) => q[0] !== limit)
