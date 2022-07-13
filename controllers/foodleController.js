@@ -173,9 +173,6 @@ const getImagesById = (req, res, next) => {
       if (err) {
         next(err);
       } else {
-        const publicFolder =
-          req.protocol + "://" + req.get("host") + "/foodles/";
-
         const images = data?.images.sort((a, b) => a.order - b.order);
 
         res.json({ data: { images } });
@@ -183,7 +180,7 @@ const getImagesById = (req, res, next) => {
     });
 };
 
-const createFoodle = (req, res) => {
+const createFoodle = (req, res, next) => {
   const { title, category } = req.body;
   if (!title) {
     next(new BadRequestError("title missing"));
