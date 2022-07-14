@@ -77,7 +77,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    console.info("Database connected: " + MONGO_URI);
+    console.info("Database connected");
   })
   .catch((err) => {
     console.error(err);
